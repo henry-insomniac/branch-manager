@@ -1,6 +1,6 @@
+// Package git 图结构构建层
 package git
 
-// internal/git/dag.go
 import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -14,12 +14,14 @@ type CommitNode struct {
 	Branches []string `json:"branches"` // 所属分支名
 }
 
+// BuildCommitDAG /** 构建 Commit DAG
 func BuildCommitDAG(repoPath string) (map[string]*CommitNode, error) {
 	r, err := git.PlainOpen(repoPath)
 	if err != nil {
 		return nil, err
 	}
 
+	// 构建 map
 	commitGraph := make(map[string]*CommitNode)
 
 	// 遍历所有分支
@@ -34,6 +36,13 @@ func BuildCommitDAG(repoPath string) (map[string]*CommitNode, error) {
 		}
 		branchName := ref.Name().Short()
 
+		// 它是开始遍历某个分支上的所有提交记录的地方
+		/**
+		git.LogOptions{From: ref.Hash()}	配置 Log 起点，从某个分支头部（最新 commit）开始
+
+		git.LogOptions{From: ref.Hash()} 是一个 结构体实例
+		&git.LogOptions{...} 是 指向这个结构体实例的指针
+		*/
 		iter, err := r.Log(&git.LogOptions{From: ref.Hash()})
 		if err != nil {
 			return err

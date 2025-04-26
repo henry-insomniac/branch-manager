@@ -8,8 +8,12 @@ import (
 )
 
 func main() {
-	path := "/Users/mm/work-space/react"
+	path := "/Users/mm/work-space/rc-workShop"
 	dag, err := git.BuildCommitDAG(path)
+	branchs, err := git.LoadBranches(path)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err != nil {
 		log.Fatalf("构建 DAG 失败: %v", err)
 	}
@@ -18,4 +22,5 @@ func main() {
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	_ = enc.Encode(dag)
+	_ = enc.Encode(branchs)
 }
